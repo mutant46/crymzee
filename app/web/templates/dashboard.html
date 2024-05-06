@@ -1,0 +1,304 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load user_filters %}
+{% block title %} Dashboard | Manage Your Files on the Go! {% endblock %}
+
+<main>
+  {% block content %} 
+    {% comment %} Navbar {% endcomment %} 
+    {% include 'components/navbar.html' %}
+  
+    {% comment %} Page Header {% endcomment %}
+    <div class="flex flex-wrap justify-between items-center p-6 gap-5">
+        <h1 class="text-xl md:text-2xl font-bold">My Files</h1>
+        <div class="flex gap-x-4">
+            <form
+                id="SearchForm"
+                class="flex items-center shadow-black bg-white border text-gray-700 rounded-md py-2"
+            >
+                <img
+                    src="{% static 'assets/search.png' %}"
+                    width="auto"
+                    class="px-2"
+                />
+                <input id="searchInput" type="text" class="focus:outline-none lg:w-[350px]" placeholder="Search" />
+            </form>
+            <button
+                id="clearButton"
+                type="button"
+                class="hidden bg-white border border-gray-300 text-black px-6 py-2 rounded-md"
+            >
+                Clear
+            </button>
+            <button
+                type="button"
+                class="flex items-center gap-x-2 bg-white border border-gray-300 text-black px-4 py-2 rounded-md"
+            >
+                <img src="{% static 'assets/filter.png' %}" width="16px" />
+                Filters
+            </button>
+        </div>
+        <button
+            onClick="openModal()"
+            type="button"
+            class="flex items-center gap-x-2 bg-[#09A1DA] border border-[#09A1DA] px-5 py-2 rounded-lg text-white font-semibold"
+        >
+            <img src="{% static 'assets/Icon.png' %}" width="20px" />
+            Upload File
+        </button>
+    </div>
+
+    {% comment %} Table {% endcomment %}
+    <div class="px-6 overflow-auto">
+        <table class="w-full min-w-max table-auto text-left text-gray-500">
+        <thead>
+            <tr>
+            <th class="p-4 border-b border-blue-gray-50 font-normal">Title</th>
+            <th class="p-4 border-b border-blue-gray-50 font-normal">
+                Description
+            </th>
+            <th class="p-4 border-b border-blue-gray-50 font-normal">File</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for user_file in object_list %}
+            <tr>
+            <td class="p-4 border-b border-blue-gray-50 text-black">
+                {{ user_file.title }}
+            </td>
+            <td class="p-4 border-b border-blue-gray-50">
+                {{ user_file.description }}
+            </td>
+            <td class="p-4 border-b border-blue-gray-50">
+                <div class="flex items-center gap-2">
+                <img src="{% static 'assets/download.png' %}" width="16px" />
+                {{ user_file.file_field.name|filename }}
+                </div>
+            </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+        </table>
+    </div>
+
+    {% comment %} Create Modal {% endcomment %}
+    <div
+        class="main-modal fixed w-full h-100 inset-0 z-50 overflow-hidden flex justify-center items-center animated fadeIn faster"
+        style="background: rgba(0, 0, 0, 0.8)"
+    >
+    <div
+        class="shadow-lg modal-container bg-white w-11/12 md:max-w-md mx-auto rounded-md shadow-lg z-50 overflow-y-auto"
+    >
+        <div class="modal-content py-4 text-left px-6">
+        <!--Title-->
+        <h3 class="text-center text-2xl font-bold">Upload File</h3>
+        
+        <!--Body-->
+        <div class="my-5">
+            <form id="uploadForm">
+                {% csrf_token %}
+                <div class="mb-4">
+                    <label for="title" class="block text-sm font-semibold mb-3">Title</label>
+                    <input
+                        type="text"
+                        name="title"
+                        placeholder="Title"
+                        class="shadow-black appearance-none border w-full px-3 py-4 text-gray-700 leading-tight rounded-md"
+                        id="title"
+                        required
+                    />
+                </div>
+                <div class="mb-4">
+                    <label for="description" class="block text-sm font-semibold mb-3">Description</label>
+                    <textarea
+                        name="description"
+                        placeholder="Add some description here"
+                        class="shadow-black appearance-none border w-full px-3 py-3 text-gray-700 rounded-md"
+                        id="description"
+                        required></textarea>
+                </div>
+                <div class="mb-4">
+                    <label  for="file_field" class="block text-sm font-semibold mb-3">Upload</label>
+                    <div class="flex items-center justify-center w-full">
+                        <div class="rounded-lg border border-dashed w-full px-10 py-6 text-center" id="dropZone">
+                            <div class="w-full text-center gap-2 flex flex-col items-center justify-center items-center">
+                                <div class="flex items-center">
+                                    <img src="{% static 'assets/upload_file.png' %}" width="auto" class="mx-1" />
+                                    <span class="text-lg text-gray-400" id="dropText">Drag & Drop your files here</span>
+                                </div>
+                                <span class="text-sm">OR</span>
+                                <button id="browseButton" class="text-center px-5 bg-transparent hover:bg-[#09A1DA] border border-[#09A1DA] text-[#09A1DA] hover:text-white py-2 rounded-xl">
+                                    Browse
+                                </button>
+                            </div>
+                            <input type="file" class="hidden" name="file_field" id="file_field" required>
+                        </div>
+                    </div>
+                </div>
+
+                <!--Footer-->
+                <div class="flex justify-center pt-2 gap-x-3">
+                    <button
+                        class="focus:outline-none flex-grow modal-close px-4 bg-[#FF4B26] p-3 rounded-lg text-white font-semibold"
+                    >
+                        Cancel
+                    </button>
+                    <button
+                        type="submit"
+                        class="focus:outline-none flex-grow px-4 bg-[#09A1DA] p-3 rounded-lg text-white font-semibold"
+                    >
+                        Save
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+    </div>
+    </div>
+
+    <!-- Progress Modal -->
+    <div id="loadingModal" class="fixed top-0 left-0 w-full h-full bg-black bg-opacity-80 flex items-center justify-center hidden">
+        <div class="bg-white rounded-lg p-8">
+            <span class="text-lg font-semibold" id="progressText">Uploading...</span>
+            <progress id="progressBar" max="100" value="0"></progress>
+        </div>
+    </div>
+
+  {% endblock %}
+</main>
+
+{% block script %}
+    <script>
+
+        {% comment %} Clear Search {% endcomment %}
+        var urlParams = new URLSearchParams(window.location.search);
+        if (urlParams.has("search")) {
+            document.getElementById("clearButton").style.display = "inline-block";
+        }
+
+        document.getElementById("clearButton").addEventListener("click", function() {
+            // Get current URL
+            var currentUrl = window.location.href;
+            
+            // Remove the search query parameter
+            var updatedUrl = currentUrl.replace(/[\?&]search=[^&]+/, "");
+            
+            // Redirect to the updated URL
+            window.location.href = updatedUrl;
+        });
+
+        {% comment %} Search {% endcomment %}
+        document.getElementById("SearchForm").addEventListener("submit", function(event) {
+            event.preventDefault(); // Prevent form submission
+            
+            var searchInputValue = document.getElementById("searchInput").value.trim();
+            if (searchInputValue !== "") {
+              // Get current URL
+              var currentUrl = window.location.href;
+              
+              // Check if the current URL already has query parameters
+              var separator = currentUrl.includes("?") ? "&" : "?";
+              
+              // Append the search query parameter
+              var updatedUrl = currentUrl + separator + "search=" + encodeURIComponent(searchInputValue);
+              
+              // Redirect to the updated URL
+              window.location.href = updatedUrl;
+            }
+          });
+
+        {% comment %} Browse {% endcomment %}
+        document.getElementById('browseButton').addEventListener('click', function(e) {
+            event.preventDefault()
+            document.getElementById('file_field').click();
+        });
+        {% comment %} Upload Form {% endcomment %}
+        document.getElementById('uploadForm').addEventListener('submit', function(event) {
+            event.preventDefault();
+        
+            const formData = new FormData(this);
+            fetch('files/create/', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.json();
+            })
+            .then(data => {
+                modalClose();
+                setTimeout(() => location.reload(), 200)
+            })
+            .catch(error => {
+                // Handle errors
+                console.error('There was a problem with your fetch operation:', error);
+            });
+        });
+
+
+        {% comment %} Upload Form Modal {% endcomment %}
+        const uploadForm = document.getElementById('uploadForm')
+        const modal = document.querySelector('.main-modal');
+        const closeButton = document.querySelectorAll('.modal-close');
+
+        const modalClose = () => {
+            modal.classList.remove('fadeIn');
+            modal.classList.add('fadeOut');
+            uploadForm.reset();
+            setTimeout(() => {
+                modal.style.display = 'none';
+            }, 100);
+        }
+
+        const openModal = () => {
+            modal.classList.remove('fadeOut');
+            modal.classList.add('fadeIn');
+            modal.style.display = 'flex';
+        }
+
+        for (let i = 0; i < closeButton.length; i++) {
+            const elements = closeButton[i];
+            elements.onclick = (e) => modalClose();
+            modal.style.display = 'none';
+            window.onclick = function (event) {
+                if (event.target == modal) modalClose();
+            }
+        }
+
+        const dropZone = document.getElementById('dropZone');
+        const fileInput = document.getElementById('file_field');
+        const dropText = document.getElementById('dropText');
+    
+        fileInput.addEventListener('change', function() {
+            const files = this.files;
+            if (files.length > 0) {
+                dropText.textContent = files[0].name;
+            } else {
+                dropText.textContent = 'Drag & Drop your files here';
+            }
+        });
+
+        fileInput.addEventListener('reset', function() {
+            dropText.textContent = 'Drag & Drop your files here';
+        });
+
+        dropZone.addEventListener('dragover', function(e) {
+            e.preventDefault();
+            dropZone.classList.add('border-blue-500');
+        });
+    
+        dropZone.addEventListener('dragleave', function() {
+            dropZone.classList.remove('border-blue-500');
+        });
+    
+        dropZone.addEventListener('drop', function(e) {
+            e.preventDefault();
+            dropZone.classList.remove('border-blue-500');
+            const files = e.dataTransfer.files;
+            fileInput.files = files;
+            dropText.textContent = files[0].name;
+        });
+    </script>
+{% endblock %}

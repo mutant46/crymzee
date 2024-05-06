@@ -1,0 +1,48 @@
+{% load static %}
+<nav
+  class="flex items-center justify-between flex-wrap shadow-gray shadow-md px-6 py-4"
+>
+  <div class="flex items-center flex-shrink-0 text-white mr-6">
+    <img src="{% static 'assets/logo.png' %}" width="40px" />
+  </div>
+
+  <div
+    class="flex justify-between lg:flex lg:items-center lg:w-auto justify-end"
+  >
+    <form method="post" action="{% url 'account_logout' %}" class="hidden md:block">
+      {% csrf_token %}
+      <button
+        type="submit"
+        class="flex items-center gap-2 text-sm px-4 py-2 font-semibold text-gray-500"
+      >
+        Logout
+        <img
+          src="{% static 'assets/logout.png' %}"
+          width="auto"
+          class="p-1 rounded-md shadow shadow-lg"
+        />
+      </button>
+    </form>
+
+    {% comment %} Profile {% endcomment %}
+    <div class="flex items-center gap-4">
+      <img
+        src="{% static 'assets/avatar.png' %}"
+        width="auto"
+        class=""
+      />
+      <div class="flex flex-col text-sm" title="{{ user.email }}">
+        <span>
+          {% if user.first_name %}
+            {{ user.first_name }}
+          {% else %}
+            Junaid
+          {% endif %}
+        </span>
+        <span class="text-gray-400">
+          {{ user.email|truncatechars:15 }}
+        </span>
+      </div>
+    </div>
+  </div>
+</nav>

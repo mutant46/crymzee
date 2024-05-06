@@ -1,0 +1,51 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+    <main class="min-h-screen flex items-center justify-center py-8">
+        <section class="w-full mx-5 md:w-1/2 lg:w-4/12">
+            <a href="{% url 'home' %}">
+                <img src="{% static 'assets/logo.png' %}" width="70px" class="mb-4 block mx-auto" />
+            </a>
+            <h1 class="text-xl md:text-4xl font-semibold text-center">Welcome Back</h1>
+            
+            {% include 'components/errors.html' with form=form field=None error_type='form' %}
+            <div class="py-5 px-6 shadow-[rgba(0,0,0,0.2)] shadow-lg rounded-xl">        
+                {% url 'account_login' as action_url %}
+                <form method="post" action="{{ action_url }}" class="my-8">
+                    {% csrf_token %}
+                
+                    {# Render each form field with custom styling #}
+                    {% for field in form %}
+                        {% include 'components/text_input.html' with field=field %}
+                    {% endfor %}
+                
+                    {# Additional form elements or hidden fields if needed #}
+                    {% if redirect_field_value %}
+                        <input type="hidden" name="{{ redirect_field_name }}" value="{{ redirect_field_value }}">
+                    {% endif %}
+
+                    {# Forgot Link #}
+                    <a href="#" class="text-[#09A1DA] underline text-right text-sm block">
+                        Forgot password
+                    </a>
+                    
+                    {# Submt button #}
+                    <div class="flex flex-col items-center justify-center gap-2 my-8">
+                        <button
+                            type="submit"
+                            class="text-center bg-[#09A1DA] hover:bg-transparent border border-[#09A1DA] hover:text-[#09A1DA] text-white py-[10px] w-[250px] rounded-lg">
+                            Sign In
+                        </button>
+                        <span class="text-gray-700">OR</span>
+                        <a
+                            href="{% url 'account_signup' %}"
+                            class="text-center bg-transparent hover:bg-[#09A1DA] border border-[#09A1DA] hover:text-white text-[#09A1DA] py-[10px] w-[250px] rounded-lg">
+                            Sign Up
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </section>
+    </main>
+{% endblock %}

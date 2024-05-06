@@ -1,0 +1,41 @@
+{% load widget_tweaks %}
+{% if field.name != 'remember' %}
+    <div class="my-5">
+        <label for="{{ field.name }}" class="block text-sm font-semibold mb-3">
+            {{ field.label|title }}
+        </label>
+        {% if 'password' in field.name %}
+            <div class="flex items-center shadow-black appearance-none border text-gray-700 leading-tight rounded-md">
+                <input name="{{ field.name }}" id="{{ field.name }}" type="password" placeholder="password" class="px-3 py-4 flex-grow" />
+                <button class="px-4" onclick="togglePasswordVisibility(event, '{{ field.name }}')">
+                    <div id="eyeIconOpen"><i class="fas fa-eye text-sm"></i></div>
+                    <div id="eyeIconClosed" style="display:none;"><i class="fas fa-eye-slash text-sm"></i></div>
+                </button>
+            </div>
+        {% else %}
+            {% render_field field class="shadow-black appearance-none border w-full px-3 py-4 text-gray-700 leading-tight rounded-md" id=field.name %}
+        {% endif %}
+
+        {% comment %} Field Errors {% endcomment %}
+        {% include 'components/errors.html' with form=None field=field error_type='field' %}
+    </div>
+{% endif %}
+
+<script>
+    function togglePasswordVisibility(event, fieldName) {
+        event.preventDefault();
+        var passwordInput = document.getElementById(fieldName);
+        var eyeIconOpen = passwordInput.nextElementSibling.querySelector('#eyeIconOpen');
+        var eyeIconClosed = passwordInput.nextElementSibling.querySelector('#eyeIconClosed');
+
+        if (passwordInput.type === "password") {
+            passwordInput.type = "text";
+            eyeIconOpen.style.display = "none";
+            eyeIconClosed.style.display = "block";
+        } else {
+            passwordInput.type = "password";
+            eyeIconOpen.style.display = "block";
+            eyeIconClosed.style.display = "none";
+        }
+    }
+</script>
